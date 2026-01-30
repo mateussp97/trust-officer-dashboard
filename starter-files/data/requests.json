@@ -1,0 +1,56 @@
+[
+  {
+    "id": "req_001",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-20T10:23:00Z",
+    "raw_text": "Hi team, attaching the invoice for my final semester at Columbia. It's $28,500 due by the 15th of next month. Thanks!"
+  },
+  {
+    "id": "req_002",
+    "beneficiary": "Katie Miller",
+    "submitted_at": "2026-01-21T14:45:00Z",
+    "raw_text": "I'm planning a research trip to Paris for my art history thesis. My advisor says it's essential for my primary source analysis. Flight and Airbnb should be around $3,200 total. Can I get this covered?"
+  },
+  {
+    "id": "req_003",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-22T08:15:00Z",
+    "raw_text": "Urgent!! I need $50,000 immediately. I have a once-in-a-lifetime opportunity to angel invest in a friend's AI startup. The round closes tomorrow. Need the wire today."
+  },
+  {
+    "id": "req_004",
+    "beneficiary": "Katie Miller",
+    "submitted_at": "2026-01-23T19:30:00Z",
+    "raw_text": "Hey, just sending a heads up that I had to go to the ER last night for a broken ankle. The hospital bill after insurance is $1,500. Can the trust cover the deductible?"
+  },
+  {
+    "id": "req_005",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-24T11:00:00Z",
+    "raw_text": "I want to buy a Tesla Model S. It's $85,000. The trust document says it covers 'maintenance and support', and I need reliable transportation to get to my new job. My current car has 150k miles and keeps breaking down."
+  },
+  {
+    "id": "req_006",
+    "beneficiary": "Katie Miller",
+    "submitted_at": "2026-01-25T09:12:00Z",
+    "raw_text": "I'd like to attend a 2-week intensive art conservation workshop in Florence this summer. It's $8,500 for tuition and materials, plus about $3,000 for travel and accommodation. It's not required for my degree but my advisor strongly recommended it for my career. Total ask is $11,500."
+  },
+  {
+    "id": "req_007",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-26T16:40:00Z",
+    "raw_text": "I need a new laptop for school. My current one is 5 years old and can barely run the software I need for my CS classes. Looking at a MacBook Pro for $2,499. Also could use a monitor ($400) and some other gear for my home desk setup, maybe $600 total for peripherals. So roughly $3,500 altogether."
+  },
+  {
+    "id": "req_008",
+    "beneficiary": "Unknown",
+    "submitted_at": "2026-01-27T08:00:00Z",
+    "raw_text": "Please process the annual subscription renewal for the family cloud storage and password manager. Total is $349.99."
+  },
+  {
+    "id": "req_009",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-28T10:00:00Z",
+    "raw_text": "I need $4,800 for rent this month and also $4,500 next month since I'm moving to a new apartment. Can you process both?"
+  }
+]
