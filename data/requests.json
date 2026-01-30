@@ -1,0 +1,197 @@
+[
+  {
+    "id": "req_001",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-20T10:23:00Z",
+    "raw_text": "Hi team, attaching the invoice for my final semester at Columbia. It's $28,500 due by the 15th of next month. Thanks!",
+    "status": "pending",
+    "parsed": {
+      "amount": 28500,
+      "category": "Education",
+      "urgency": "high",
+      "summary": "Sam Miller is requesting $28,500 for his final semester tuition at Columbia, due by the 15th of next month.",
+      "policy_notes": [
+        "Amount exceeds $20,000 — requires high-priority review."
+      ],
+      "flags": [
+        "requires_review"
+      ]
+    }
+  },
+  {
+    "id": "req_002",
+    "beneficiary": "Katie Miller",
+    "submitted_at": "2026-01-21T14:45:00Z",
+    "raw_text": "I'm planning a research trip to Paris for my art history thesis. My advisor says it's essential for my primary source analysis. Flight and Airbnb should be around $3,200 total. Can I get this covered?",
+    "status": "pending",
+    "parsed": {
+      "amount": 3200,
+      "category": "Education",
+      "urgency": "medium",
+      "summary": "Katie Miller is requesting $3,200 to cover the costs of a research trip to Paris for her art history thesis.",
+      "policy_notes": [],
+      "flags": []
+    }
+  },
+  {
+    "id": "req_003",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-22T08:15:00Z",
+    "raw_text": "Urgent!! I need $50,000 immediately. I have a once-in-a-lifetime opportunity to angel invest in a friend's AI startup. The round closes tomorrow. Need the wire today.",
+    "status": "denied",
+    "parsed": {
+      "amount": 50000,
+      "category": "Investment",
+      "urgency": "critical",
+      "summary": "Sam Miller is requesting $50,000 for an urgent angel investment in a friend's AI startup.",
+      "policy_notes": [
+        "Prohibited: speculative investment",
+        "Prohibited: Speculative investments are not allowed under trust policy.",
+        "Amount exceeds $20,000 — requires high-priority review."
+      ],
+      "flags": [
+        "prohibited",
+        "requires_review"
+      ]
+    },
+    "resolution": {
+      "action": "denied",
+      "decided_by": "Margaret Chen",
+      "decided_at": "2026-01-30T18:28:54.652Z",
+      "notes": "Denied. Speculative investments are explicitly prohibited under trust policy. Angel investing in a startup is not an approved use of trust funds."
+    }
+  },
+  {
+    "id": "req_004",
+    "beneficiary": "Katie Miller",
+    "submitted_at": "2026-01-23T19:30:00Z",
+    "raw_text": "Hey, just sending a heads up that I had to go to the ER last night for a broken ankle. The hospital bill after insurance is $1,500. Can the trust cover the deductible?",
+    "status": "approved",
+    "parsed": {
+      "amount": 1500,
+      "category": "Medical",
+      "urgency": "critical",
+      "summary": "Katie Miller is requesting coverage for a $1,500 hospital bill after insurance for a broken ankle.",
+      "policy_notes": [],
+      "flags": []
+    },
+    "resolution": {
+      "action": "approved",
+      "decided_by": "Margaret Chen",
+      "decided_at": "2026-01-30T18:28:16.714Z",
+      "notes": "Medical expense fully covered under trust policy. ER visit for broken ankle.",
+      "approved_amount": 1500,
+      "ledger_entry_id": "txn_1769797696714"
+    }
+  },
+  {
+    "id": "req_005",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-24T11:00:00Z",
+    "raw_text": "I want to buy a Tesla Model S. It's $85,000. The trust document says it covers 'maintenance and support', and I need reliable transportation to get to my new job. My current car has 150k miles and keeps breaking down.",
+    "status": "pending",
+    "parsed": {
+      "amount": 85000,
+      "category": "Vehicle",
+      "urgency": "medium",
+      "summary": "Sam Miller is requesting $85,000 to purchase a Tesla Model S for reliable transportation to a new job.",
+      "policy_notes": [
+        "Prohibited: luxury vehicle",
+        "Prohibited: Luxury vehicles are not allowed under trust policy.",
+        "Amount exceeds $20,000 — requires high-priority review."
+      ],
+      "flags": [
+        "prohibited",
+        "requires_review"
+      ]
+    }
+  },
+  {
+    "id": "req_006",
+    "beneficiary": "Katie Miller",
+    "submitted_at": "2026-01-25T09:12:00Z",
+    "raw_text": "I'd like to attend a 2-week intensive art conservation workshop in Florence this summer. It's $8,500 for tuition and materials, plus about $3,000 for travel and accommodation. It's not required for my degree but my advisor strongly recommended it for my career. Total ask is $11,500.",
+    "status": "approved",
+    "parsed": {
+      "amount": 11500,
+      "category": "Education",
+      "urgency": "medium",
+      "summary": "Katie Miller is requesting $11,500 to attend a 2-week intensive art conservation workshop in Florence, covering tuition, materials, travel, and accommodation.",
+      "policy_notes": [],
+      "flags": []
+    },
+    "resolution": {
+      "action": "approved",
+      "decided_by": "Margaret Chen",
+      "decided_at": "2026-01-30T19:36:02.298Z",
+      "notes": "",
+      "approved_amount": 11500,
+      "ledger_entry_id": "txn_1769801762297"
+    }
+  },
+  {
+    "id": "req_007",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-26T16:40:00Z",
+    "raw_text": "I need a new laptop for school. My current one is 5 years old and can barely run the software I need for my CS classes. Looking at a MacBook Pro for $2,499. Also could use a monitor ($400) and some other gear for my home desk setup, maybe $600 total for peripherals. So roughly $3,500 altogether.",
+    "status": "pending",
+    "parsed": {
+      "amount": 3500,
+      "category": "Other",
+      "urgency": "medium",
+      "summary": "Sam Miller is requesting $3,500 for a new laptop, monitor, and peripherals for school.",
+      "policy_notes": [],
+      "flags": []
+    }
+  },
+  {
+    "id": "req_008",
+    "beneficiary": "Unknown",
+    "submitted_at": "2026-01-27T08:00:00Z",
+    "raw_text": "Please process the annual subscription renewal for the family cloud storage and password manager. Total is $349.99.",
+    "status": "denied",
+    "parsed": {
+      "amount": 349.99,
+      "category": "General Support",
+      "urgency": "low",
+      "summary": "Request for annual subscription renewal for family cloud storage and password manager.",
+      "policy_notes": [
+        "Beneficiary \"Unknown\" is not a known trust beneficiary."
+      ],
+      "flags": [
+        "unknown_beneficiary"
+      ]
+    },
+    "resolution": {
+      "action": "denied",
+      "decided_by": "Margaret Chen",
+      "decided_at": "2026-01-30T19:22:43.198Z",
+      "notes": ""
+    }
+  },
+  {
+    "id": "req_009",
+    "beneficiary": "Sam Miller",
+    "submitted_at": "2026-01-28T10:00:00Z",
+    "raw_text": "I need $4,800 for rent this month and also $4,500 next month since I'm moving to a new apartment. Can you process both?",
+    "status": "approved",
+    "parsed": {
+      "amount": 4800,
+      "category": "General Support",
+      "urgency": "medium",
+      "summary": "Sam Miller is requesting $4,800 for rent this month.",
+      "policy_notes": [
+        "Capped at $5,000/month per beneficiary"
+      ],
+      "flags": []
+    },
+    "resolution": {
+      "action": "approved",
+      "decided_by": "Margaret Chen",
+      "decided_at": "2026-01-30T19:04:11.586Z",
+      "notes": "",
+      "approved_amount": 4800,
+      "ledger_entry_id": "txn_1769799851586"
+    }
+  }
+]
