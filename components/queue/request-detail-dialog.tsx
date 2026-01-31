@@ -27,7 +27,8 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PolicyCheckDisplay } from "./policy-check-display";
 import { useDashboardStore } from "@/stores/dashboard-store";
-import { formatCurrency, formatDateTime, formatRelativeTime } from "@/lib/format";
+import { formatCurrency, formatDateTime } from "@/lib/format";
+import { RelativeTime } from "@/components/ui/relative-time";
 import type { TrustRequest } from "@/lib/types";
 import {
   CheckIcon,
@@ -165,7 +166,7 @@ export function RequestDetailDialog({
               </Badge>
             </div>
             <DialogDescription>
-              {request.beneficiary} &middot; {formatRelativeTime(request.submitted_at)}
+              {request.beneficiary} &middot; <RelativeTime date={request.submitted_at} />
             </DialogDescription>
           </DialogHeader>
 
@@ -182,7 +183,7 @@ export function RequestDetailDialog({
           <Separator />
 
           {/* AI Parsed section */}
-          <div className="space-y-3">
+          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <SparklesIcon className="size-3.5 text-muted-foreground" />
@@ -315,7 +316,7 @@ export function RequestDetailDialog({
           {isPending && parsed && (
             <>
               <Separator />
-              <div className="space-y-3">
+              <div className="rounded-lg border-2 border-primary/20 bg-background p-4 space-y-3">
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Officer Decision
                 </label>
@@ -323,19 +324,21 @@ export function RequestDetailDialog({
                 {/* Override amount */}
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">
-                    Approved Amount (leave blank to use AI-parsed amount:{" "}
-                    {formatCurrency(parsed.amount)})
+                    Override Amount
                   </label>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">$</span>
                     <Input
                       type="number"
-                      placeholder={parsed.amount.toString()}
+                      placeholder="Override amount..."
                       value={overrideAmount}
                       onChange={(e) => setOverrideAmount(e.target.value)}
                       className="font-mono"
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank to approve for {formatCurrency(parsed.amount)}
+                  </p>
                 </div>
 
                 {/* Notes */}

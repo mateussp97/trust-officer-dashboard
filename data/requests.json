@@ -134,7 +134,7 @@
     "beneficiary": "Sam Miller",
     "submitted_at": "2026-01-26T16:40:00Z",
     "raw_text": "I need a new laptop for school. My current one is 5 years old and can barely run the software I need for my CS classes. Looking at a MacBook Pro for $2,499. Also could use a monitor ($400) and some other gear for my home desk setup, maybe $600 total for peripherals. So roughly $3,500 altogether.",
-    "status": "pending",
+    "status": "approved",
     "parsed": {
       "amount": 3500,
       "category": "Other",
@@ -142,6 +142,14 @@
       "summary": "Sam Miller is requesting $3,500 for a new laptop, monitor, and peripherals for school.",
       "policy_notes": [],
       "flags": []
+    },
+    "resolution": {
+      "action": "approved",
+      "decided_by": "Margaret Chen",
+      "decided_at": "2026-01-31T13:28:23.476Z",
+      "notes": "",
+      "approved_amount": 3500,
+      "ledger_entry_id": "txn_1769866103476"
     }
   },
   {

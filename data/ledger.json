@@ -123,5 +123,14 @@
     "type": "DEBIT",
     "related_request_id": "req_006",
     "created_by": "Margaret Chen"
+  },
+  {
+    "id": "txn_1769866103476",
+    "date": "2026-01-31T13:28:23.476Z",
+    "description": "Beneficiary Distribution — Sam Miller (Other)",
+    "amount": 3500,
+    "type": "DEBIT",
+    "related_request_id": "req_007",
+    "created_by": "Margaret Chen"
   }
 ]
