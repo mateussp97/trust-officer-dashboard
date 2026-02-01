@@ -2,6 +2,7 @@
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface SiteHeaderProps {
   title: string;
@@ -22,7 +23,10 @@ export function SiteHeader({ title, description, actions }: SiteHeaderProps) {
           )}
         </div>
       </div>
-      {actions && <div className="ml-auto flex items-center gap-2">{actions}</div>}
+      <div className="ml-auto flex items-center gap-2">
+        <ThemeToggle />
+        {actions}
+      </div>
     </header>
   );
 }

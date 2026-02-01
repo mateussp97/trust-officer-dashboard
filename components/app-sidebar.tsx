@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookOpenIcon,
   InboxIcon,
-  ShieldCheckIcon,
   UserIcon,
 } from "lucide-react";
 
@@ -46,8 +46,14 @@ export function AppSidebar() {
     <Sidebar variant="inset">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1">
-          <div className="flex size-7 items-center justify-center rounded-md bg-foreground">
-            <ShieldCheckIcon className="size-4 text-background" />
+          <div className="flex size-7 items-center justify-center">
+            <Image
+              src="/sava-emblem.webp"
+              alt="Sava Trust"
+              width={28}
+              height={28}
+              className="size-7 dark:brightness-[3]"
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold tracking-tight">
