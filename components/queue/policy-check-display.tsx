@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  ShieldAlertIcon,
-  ShieldCheckIcon,
-  AlertTriangleIcon,
-} from "lucide-react";
+import { ShieldAlertIcon, AlertTriangleIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { PolicyFlag } from "@/lib/types";
+import { FLAG_CONFIG } from "@/lib/constants";
 
 interface PolicyCheckDisplayProps {
   flags: PolicyFlag[];
@@ -14,34 +11,30 @@ interface PolicyCheckDisplayProps {
   compact?: boolean;
 }
 
-const FLAG_CONFIG: Record<
-  PolicyFlag,
-  { label: string; severity: "blocked" | "warning" }
-> = {
-  prohibited: { label: "Prohibited", severity: "blocked" },
-  over_limit: { label: "Over Limit", severity: "warning" },
-  requires_review: { label: "Requires Review", severity: "warning" },
-  unknown_beneficiary: { label: "Unknown Beneficiary", severity: "warning" },
-  exceeds_monthly_cap: { label: "Exceeds Monthly Cap", severity: "warning" },
-};
-
 export function PolicyCheckDisplay({
   flags,
   notes,
   compact = false,
 }: PolicyCheckDisplayProps) {
-  if (flags.length === 0) {
+  // Return nothing when compliant AND no notes
+  if (flags.length === 0 && notes.length === 0) {
+    return null;
+  }
+
+  // If only notes (no flags), show them in a simple info style
+  if (flags.length === 0 && notes.length > 0) {
     return (
-      <div className="flex items-center gap-1.5 text-emerald-600">
-        <ShieldCheckIcon className="size-3.5" />
-        <span className="text-xs font-medium">Policy Compliant</span>
-      </div>
+      <ul className="space-y-1">
+        {notes.map((note, i) => (
+          <li key={i} className="text-xs text-muted-foreground">
+            {note}
+          </li>
+        ))}
+      </ul>
     );
   }
 
-  const hasBlocked = flags.some(
-    (f) => FLAG_CONFIG[f]?.severity === "blocked"
-  );
+  const hasBlocked = flags.some((f) => FLAG_CONFIG[f]?.severity === "blocked");
 
   if (compact) {
     return (
@@ -52,7 +45,9 @@ export function PolicyCheckDisplay({
           return (
             <Badge
               key={flag}
-              variant={config.severity === "blocked" ? "destructive" : "outline"}
+              variant={
+                config.severity === "blocked" ? "destructive" : "outline"
+              }
               className={
                 config.severity === "warning"
                   ? "border-amber-200 bg-amber-50 text-amber-700"
@@ -76,7 +71,9 @@ export function PolicyCheckDisplay({
           <AlertTriangleIcon className="size-3.5 text-amber-500" />
         )}
         <span
-          className={`text-xs font-medium ${hasBlocked ? "text-red-600" : "text-amber-600"}`}
+          className={`text-xs font-medium ${
+            hasBlocked ? "text-red-600" : "text-amber-600"
+          }`}
         >
           {hasBlocked ? "Policy Violation" : "Requires Attention"}
         </span>
@@ -88,7 +85,9 @@ export function PolicyCheckDisplay({
           return (
             <Badge
               key={flag}
-              variant={config.severity === "blocked" ? "destructive" : "outline"}
+              variant={
+                config.severity === "blocked" ? "destructive" : "outline"
+              }
               className={
                 config.severity === "warning"
                   ? "border-amber-200 bg-amber-50 text-amber-700"

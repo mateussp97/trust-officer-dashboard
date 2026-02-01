@@ -14,13 +14,12 @@ interface DashboardState {
   balance: number;
   totalCredits: number;
   totalDebits: number;
-  pendingCount: number;
-  pendingExposure: number;
 
   // Loading states
   isLoadingLedger: boolean;
   isLoadingRequests: boolean;
   isParsingRequest: Record<string, boolean>;
+  isProcessingRequest: Record<string, boolean>;
 
   // Actions
   fetchLedger: () => Promise<void>;
@@ -39,6 +38,8 @@ interface DashboardState {
   ) => Promise<void>;
   denyRequest: (id: string, notes: string) => Promise<void>;
   updateOverride: (id: string, override: OfficerOverride) => Promise<void>;
+  batchApprove: (ids: string[]) => Promise<{ succeeded: number; failed: number }>;
+  batchDeny: (ids: string[]) => Promise<{ succeeded: number; failed: number }>;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -48,11 +49,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   balance: 0,
   totalCredits: 0,
   totalDebits: 0,
-  pendingCount: 0,
-  pendingExposure: 0,
   isLoadingLedger: false,
   isLoadingRequests: false,
   isParsingRequest: {},
+  isProcessingRequest: {},
 
   fetchLedger: async () => {
     set({ isLoadingLedger: true });
@@ -75,11 +75,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     try {
       const res = await fetch("/api/requests");
       const data: RequestsSummary = await res.json();
-      set({
-        requests: data.requests,
-        pendingCount: data.pendingCount,
-        pendingExposure: data.pendingExposure,
-      });
+      set({ requests: data.requests });
     } finally {
       set({ isLoadingRequests: false });
     }
@@ -128,38 +124,117 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
 
   approveRequest: async (id, notes, approvedAmount) => {
-    const res = await fetch(`/api/requests/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "approve",
-        notes,
-        approved_amount: approvedAmount,
-      }),
-    });
+    if (get().isProcessingRequest[id]) return;
+    set((s) => ({ isProcessingRequest: { ...s.isProcessingRequest, [id]: true } }));
 
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.error || "Failed to approve request");
+    // Snapshot for rollback
+    const prevState = {
+      requests: get().requests,
+      balance: get().balance,
+      totalDebits: get().totalDebits,
+    };
+
+    const request = get().requests.find((r) => r.id === id);
+    const amount =
+      approvedAmount ??
+      request?.officer_override?.amount ??
+      request?.parsed?.amount ??
+      0;
+
+    // Optimistic update (pendingCount/pendingExposure auto-derive from requests)
+    set((s) => ({
+      requests: s.requests.map((r) =>
+        r.id === id ? { ...r, status: "approved" as const } : r
+      ),
+      balance: s.balance - amount,
+      totalDebits: s.totalDebits + amount,
+    }));
+
+    try {
+      const res = await fetch(`/api/requests/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "approve",
+          notes,
+          approved_amount: approvedAmount,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        // Rollback
+        set(prevState);
+        throw new Error(error.error || "Failed to approve request");
+      }
+
+      // Reconcile with server truth
+      await get().fetchAll();
+    } catch (error) {
+      // Ensure rollback on network errors too
+      if (get().requests.find((r) => r.id === id)?.status === "approved") {
+        set(prevState);
+      }
+      throw error;
+    } finally {
+      set((s) => ({ isProcessingRequest: { ...s.isProcessingRequest, [id]: false } }));
     }
-
-    // Refetch both to stay in sync
-    await get().fetchAll();
   },
 
   denyRequest: async (id, notes) => {
-    const res = await fetch(`/api/requests/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "deny", notes }),
-    });
+    if (get().isProcessingRequest[id]) return;
+    set((s) => ({ isProcessingRequest: { ...s.isProcessingRequest, [id]: true } }));
 
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.error || "Failed to deny request");
+    // Snapshot for rollback
+    const prevState = {
+      requests: get().requests,
+    };
+
+    // Optimistic update (pendingCount/pendingExposure auto-derive from requests)
+    set((s) => ({
+      requests: s.requests.map((r) =>
+        r.id === id ? { ...r, status: "denied" as const } : r
+      ),
+    }));
+
+    try {
+      const res = await fetch(`/api/requests/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "deny", notes }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        set(prevState);
+        throw new Error(error.error || "Failed to deny request");
+      }
+
+      await get().fetchAll();
+    } catch (error) {
+      if (get().requests.find((r) => r.id === id)?.status === "denied") {
+        set(prevState);
+      }
+      throw error;
+    } finally {
+      set((s) => ({ isProcessingRequest: { ...s.isProcessingRequest, [id]: false } }));
     }
+  },
 
-    await get().fetchAll();
+  batchApprove: async (ids) => {
+    const results = await Promise.allSettled(
+      ids.map((id) => get().approveRequest(id, "Batch approved", undefined))
+    );
+    const succeeded = results.filter((r) => r.status === "fulfilled").length;
+    return { succeeded, failed: ids.length - succeeded };
+  },
+
+  batchDeny: async (ids) => {
+    const results = await Promise.allSettled(
+      ids.map((id) => get().denyRequest(id, "Batch denied"))
+    );
+    const succeeded = results.filter((r) => r.status === "fulfilled").length;
+    return { succeeded, failed: ids.length - succeeded };
   },
 
   updateOverride: async (id, override) => {
@@ -177,3 +252,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     }));
   },
 }));
+
+// Derived selectors - computed from requests array
+export const selectPendingCount = (state: DashboardState) =>
+  state.requests.filter((r) => r.status === "pending").length;
+
+export const selectPendingExposure = (state: DashboardState) =>
+  state.requests
+    .filter((r) => r.status === "pending")
+    .reduce((sum, r) => sum + (r.parsed?.amount ?? 0), 0);

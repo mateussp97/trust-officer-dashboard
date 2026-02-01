@@ -7,14 +7,14 @@ import {
   ClockIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDashboardStore } from "@/stores/dashboard-store";
+import { useDashboardStore, selectPendingExposure } from "@/stores/dashboard-store";
 import { formatCurrency } from "@/lib/format";
 
 export function LedgerSummaryCards() {
   const balance = useDashboardStore((s) => s.balance);
   const totalCredits = useDashboardStore((s) => s.totalCredits);
   const totalDebits = useDashboardStore((s) => s.totalDebits);
-  const pendingExposure = useDashboardStore((s) => s.pendingExposure);
+  const pendingExposure = useDashboardStore(selectPendingExposure);
 
   const cards = [
     {

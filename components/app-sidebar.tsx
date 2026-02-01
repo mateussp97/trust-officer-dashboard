@@ -23,7 +23,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { useDashboardStore } from "@/stores/dashboard-store";
+import { useDashboardStore, selectPendingCount } from "@/stores/dashboard-store";
 
 const NAV_ITEMS = [
   {
@@ -40,7 +40,7 @@ const NAV_ITEMS = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const pendingCount = useDashboardStore((s) => s.pendingCount);
+  const pendingCount = useDashboardStore(selectPendingCount);
 
   return (
     <Sidebar variant="inset">

@@ -1,18 +1,13 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
-  SparklesIcon,
-  Loader2Icon,
   InboxIcon,
-  EyeIcon,
   SearchIcon,
   ArrowUpDownIcon,
   XIcon,
   CheckCircle2Icon,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,28 +19,15 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { PolicyCheckDisplay } from "./policy-check-display";
-import { RequestDetailDialog } from "./request-detail-dialog";
-import { RelativeTime } from "@/components/ui/relative-time";
+import { RequestDetailContent } from "./request-detail-content";
+import { RequestRow } from "./request-row";
+import { BatchActionBar } from "./batch-action-bar";
+import { KeyboardShortcutHelp } from "@/components/keyboard-shortcut-help";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useDashboardStore } from "@/stores/dashboard-store";
-import { formatCurrency } from "@/lib/format";
-import { cn } from "@/lib/utils";
-import type { TrustRequest, RequestStatus, PolicyFlag } from "@/lib/types";
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Education: "border-blue-200 bg-blue-50 text-blue-700",
-  Medical: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  "General Support": "border-violet-200 bg-violet-50 text-violet-700",
-  Investment: "border-red-200 bg-red-50 text-red-700",
-  Vehicle: "border-red-200 bg-red-50 text-red-700",
-  Other: "border-gray-200 bg-gray-50 text-gray-700",
-};
-
-const STATUS_LABELS: Record<RequestStatus, string> = {
-  pending: "Pending",
-  approved: "Approved",
-  denied: "Denied",
-};
+import { useDrawerStore } from "@/stores/drawer-store";
+import type { TrustRequest, RequestStatus } from "@/lib/types";
+import { URGENCY_ORDER, CATEGORIES } from "@/lib/constants";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest first" },
@@ -58,34 +40,20 @@ const SORT_OPTIONS = [
 
 type SortOption = (typeof SORT_OPTIONS)[number]["value"];
 
-const URGENCY_ORDER: Record<string, number> = {
-  critical: 0,
-  high: 1,
-  medium: 2,
-  low: 3,
-};
-
-const CATEGORY_OPTIONS = [
-  "Education",
-  "Medical",
-  "General Support",
-  "Investment",
-  "Vehicle",
-  "Other",
-];
-
 export function RequestQueue() {
   const requests = useDashboardStore((s) => s.requests);
   const isLoadingRequests = useDashboardStore((s) => s.isLoadingRequests);
   const isParsingRequest = useDashboardStore((s) => s.isParsingRequest);
-  const parseAllPending = useDashboardStore((s) => s.parseAllPending);
 
-  const [selectedRequest, setSelectedRequest] = useState<TrustRequest | null>(
-    null
-  );
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const openDrawer = useDrawerStore((s) => s.openDrawer);
+  const closeDrawer = useDrawerStore((s) => s.closeDrawer);
+
   const [filter, setFilter] = useState<"all" | RequestStatus>("all");
-  const hasAutoParsedRef = useRef(false);
+
+  // Selection & keyboard state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [showShortcutHelp, setShowShortcutHelp] = useState(false);
 
   // Filter state
   const [search, setSearch] = useState("");
@@ -94,17 +62,7 @@ export function RequestQueue() {
   const [policyFilter, setPolicyFilter] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
 
-  // Auto-parse pending requests once when they first load
-  useEffect(() => {
-    if (hasAutoParsedRef.current) return;
-    const unparsedPending = requests.filter(
-      (r) => r.status === "pending" && !r.parsed
-    );
-    if (unparsedPending.length > 0) {
-      hasAutoParsedRef.current = true;
-      parseAllPending();
-    }
-  }, [requests, parseAllPending]);
+  // Auto-parse is now handled in the dashboard layout
 
   // Unique beneficiaries for filter dropdown
   const beneficiaries = useMemo(
@@ -201,6 +159,57 @@ export function RequestQueue() {
     });
   }, [filtered, sortBy]);
 
+  const isPendingTab = filter === "pending";
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
+
+  // Keyboard shortcuts — the hook stores shortcuts in a ref internally,
+  // so no memoization needed here.
+  useKeyboardShortcuts([
+    {
+      key: "j",
+      handler: () => setFocusedIndex((i) => Math.min(i + 1, sorted.length - 1)),
+    },
+    {
+      key: "k",
+      handler: () => setFocusedIndex((i) => Math.max(i - 1, 0)),
+    },
+    {
+      key: "Enter",
+      handler: () => {
+        if (focusedIndex >= 0 && focusedIndex < sorted.length) {
+          handleOpenDetail(sorted[focusedIndex]);
+        }
+      },
+    },
+    {
+      key: "x",
+      handler: () => {
+        if (isPendingTab && focusedIndex >= 0 && focusedIndex < sorted.length) {
+          toggleSelect(sorted[focusedIndex].id);
+        }
+      },
+    },
+    {
+      key: "Escape",
+      handler: () => {
+        if (useDrawerStore.getState().isOpen) closeDrawer();
+        else if (selectedIds.size > 0) clearSelection();
+        else setFocusedIndex(-1);
+      },
+    },
+    { key: "?", handler: () => setShowShortcutHelp(true) },
+  ]);
+
   const counts = {
     all: requests.length,
     pending: requests.filter((r) => r.status === "pending").length,
@@ -209,14 +218,10 @@ export function RequestQueue() {
   };
 
   function handleOpenDetail(request: TrustRequest) {
-    setSelectedRequest(request);
-    setDialogOpen(true);
+    openDrawer({
+      content: <RequestDetailContent requestId={request.id} />,
+    });
   }
-
-  // Keep selectedRequest in sync with store
-  const currentSelected = selectedRequest
-    ? requests.find((r) => r.id === selectedRequest.id) ?? null
-    : null;
 
   if (isLoadingRequests) {
     return (
@@ -285,7 +290,7 @@ export function RequestQueue() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All categories</SelectItem>
-              {CATEGORY_OPTIONS.map((c) => (
+              {CATEGORIES.map((c) => (
                 <SelectItem key={c} value={c}>
                   {c}
                 </SelectItem>
@@ -361,13 +366,17 @@ export function RequestQueue() {
                 )}
               </div>
             ) : (
-              <div className="space-y-2">
-                {sorted.map((request) => (
+              <div className="space-y-2" aria-live="polite">
+                {sorted.map((request, index) => (
                   <RequestRow
                     key={request.id}
                     request={request}
                     isParsing={!!isParsingRequest[request.id]}
                     onOpenDetail={handleOpenDetail}
+                    selectable={isPendingTab}
+                    selected={selectedIds.has(request.id)}
+                    onToggleSelect={toggleSelect}
+                    focused={index === focusedIndex}
                   />
                 ))}
               </div>
@@ -376,112 +385,17 @@ export function RequestQueue() {
         ))}
       </Tabs>
 
-      <RequestDetailDialog
-        request={currentSelected}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
+      {isPendingTab && (
+        <BatchActionBar
+          selectedIds={selectedIds}
+          onClearSelection={clearSelection}
+        />
+      )}
+
+      <KeyboardShortcutHelp
+        open={showShortcutHelp}
+        onOpenChange={setShowShortcutHelp}
       />
     </>
-  );
-}
-
-function RequestRow({
-  request,
-  isParsing,
-  onOpenDetail,
-}: {
-  request: TrustRequest;
-  isParsing: boolean;
-  onOpenDetail: (request: TrustRequest) => void;
-}) {
-  const parsed = request.parsed;
-  const isProhibited = parsed?.flags?.includes("prohibited");
-  const hasWarnings = (parsed?.flags ?? []).length > 0 && !isProhibited;
-
-  return (
-    <Card
-      className={cn(
-        "cursor-pointer transition-all duration-150",
-        "hover:bg-muted/40 hover:shadow-sm",
-        isProhibited && "border-l-4 border-l-red-500 bg-red-50/30",
-        hasWarnings && "border-l-4 border-l-amber-400 bg-amber-50/20"
-      )}
-      onClick={() => onOpenDetail(request)}
-    >
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-4">
-          {/* Left: main info */}
-          <div className="flex-1 space-y-1.5 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-sm">{request.beneficiary}</span>
-              <Badge
-                variant={
-                  request.status === "approved"
-                    ? "default"
-                    : request.status === "denied"
-                    ? "destructive"
-                    : "secondary"
-                }
-                className={
-                  request.status === "approved" ? "bg-emerald-600" : undefined
-                }
-              >
-                {STATUS_LABELS[request.status]}
-              </Badge>
-              {parsed?.category && (
-                <Badge
-                  variant="outline"
-                  className={CATEGORY_COLORS[parsed.category] ?? ""}
-                >
-                  {parsed.category}
-                </Badge>
-              )}
-            </div>
-
-            <p className="text-sm text-muted-foreground truncate">
-              {parsed?.summary ?? request.raw_text}
-            </p>
-
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <RelativeTime date={request.submitted_at} className="font-mono" />
-              {parsed && (
-                <PolicyCheckDisplay
-                  flags={(parsed.flags ?? []) as PolicyFlag[]}
-                  notes={[]}
-                  compact
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Right: amount + actions */}
-          <div className="flex flex-col items-end gap-2 shrink-0">
-            {isParsing ? (
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Loader2Icon className="size-3.5 animate-spin" />
-                <SparklesIcon className="size-3.5" />
-              </div>
-            ) : parsed ? (
-              <span className="text-lg font-semibold font-mono tabular-nums">
-                {formatCurrency(parsed.amount)}
-              </span>
-            ) : (
-              <span className="text-xs text-muted-foreground">—</span>
-            )}
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenDetail(request);
-              }}
-            >
-              <EyeIcon className="size-3.5" />
-              Review
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

@@ -5,7 +5,13 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const SYSTEM_PROMPT = `You are a trust fund analyst. Parse beneficiary distribution requests and extract structured data.
+function buildSystemPrompt(knownBeneficiaries: string[]): string {
+  const beneficiaryList =
+    knownBeneficiaries.length > 0
+      ? knownBeneficiaries.join(", ")
+      : "None registered";
+
+  return `You are a trust fund analyst. Parse beneficiary distribution requests and extract structured data.
 
 Trust policy rules:
 - Education: Fully covered (tuition, materials, academic travel, professional development)
@@ -14,7 +20,7 @@ Trust policy rules:
 - Large Purchases: Over $20,000 requires high-priority review
 - Prohibited: No speculative investments (angel investing, crypto, stocks), luxury vehicles (Tesla, Ferrari, etc.), or luxury goods (designer items)
 
-Known beneficiaries: Sam Miller, Katie Miller
+Known beneficiaries: ${beneficiaryList}
 
 Return a JSON object with exactly these fields:
 - amount: number (the dollar amount requested, as a number without currency symbols)
@@ -29,15 +35,17 @@ Urgency guidelines:
 - high: Upcoming deadlines within a week, large amounts over $20k
 - medium: Standard requests with reasonable timelines
 - low: No urgency mentioned, future planning`;
+}
 
 export async function parseRequestWithAI(
   rawText: string,
-  beneficiary: string
+  beneficiary: string,
+  knownBeneficiaries: string[]
 ): Promise<ParsedRequest> {
   const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-5.2",
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: buildSystemPrompt(knownBeneficiaries) },
       {
         role: "user",
         content: `Beneficiary: ${beneficiary}\n\nRequest:\n${rawText}`,
@@ -60,9 +68,7 @@ export async function parseRequestWithAI(
     category: parsed.category,
     urgency: parsed.urgency,
     summary: parsed.summary,
-    policy_notes: Array.isArray(parsed.policy_notes)
-      ? parsed.policy_notes
-      : [],
+    policy_notes: Array.isArray(parsed.policy_notes) ? parsed.policy_notes : [],
     flags: Array.isArray(parsed.flags) ? parsed.flags : [],
   };
 }

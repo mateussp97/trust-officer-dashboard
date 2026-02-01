@@ -29,6 +29,7 @@ import {
   XIcon,
   DownloadIcon,
   CalendarIcon,
+  BookOpenIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -172,8 +173,14 @@ export function LedgerTable() {
 
   if (ledger.length === 0) {
     return (
-      <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
-        No transactions yet.
+      <div className="rounded-lg border p-12 text-center">
+        <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted mb-3">
+          <BookOpenIcon className="size-6 text-muted-foreground" />
+        </div>
+        <h3 className="text-sm font-medium">No transactions yet</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          Transactions will appear here once requests are processed.
+        </p>
       </div>
     );
   }

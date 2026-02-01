@@ -121,3 +121,42 @@ export function getBalance(): number {
   const { balance } = getLedgerSummary();
   return balance;
 }
+
+export function getKnownBeneficiaries(): string[] {
+  const requests = readRequests();
+  return [...new Set(requests.map((r) => r.beneficiary))].sort();
+}
+
+export function getMonthlyGeneralSupportSpending(
+  beneficiary: string,
+  month?: Date
+): number {
+  const target = month ?? new Date();
+  const year = target.getFullYear();
+  const monthIdx = target.getMonth();
+
+  const entries = readLedger();
+  const requests = readRequests();
+
+  const approvedGSRequestIds = requests
+    .filter(
+      (r) =>
+        r.beneficiary === beneficiary &&
+        r.status === "approved" &&
+        (r.officer_override?.category ?? r.parsed?.category) ===
+          "General Support"
+    )
+    .map((r) => r.id);
+
+  return entries
+    .filter((e) => {
+      if (e.type !== "DEBIT" || !e.related_request_id) return false;
+      const entryDate = new Date(e.date);
+      return (
+        entryDate.getFullYear() === year &&
+        entryDate.getMonth() === monthIdx &&
+        approvedGSRequestIds.includes(e.related_request_id)
+      );
+    })
+    .reduce((sum, e) => sum + e.amount, 0);
+}

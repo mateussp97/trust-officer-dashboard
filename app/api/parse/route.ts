@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { parseRequestWithAI } from "@/lib/openai";
-import { updateRequest, getRequestById } from "@/lib/data";
+import {
+  updateRequest,
+  getRequestById,
+  getMonthlyGeneralSupportSpending,
+  getKnownBeneficiaries,
+} from "@/lib/data";
 import { checkPolicy } from "@/lib/policy";
 
 export async function POST(request: Request) {
@@ -15,13 +20,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const parsed = await parseRequestWithAI(raw_text, beneficiary);
+    const knownBeneficiaries = getKnownBeneficiaries();
+    const parsed = await parseRequestWithAI(
+      raw_text,
+      beneficiary,
+      knownBeneficiaries
+    );
 
-    // Run policy check and merge flags
-    const policyResult = checkPolicy(parsed, beneficiary);
-    const mergedFlags = [
-      ...new Set([...parsed.flags, ...policyResult.flags]),
-    ];
+    // Run policy check with cumulative monthly spending
+    const monthlySpending = beneficiary
+      ? getMonthlyGeneralSupportSpending(beneficiary)
+      : 0;
+    const policyResult = checkPolicy(parsed, beneficiary, monthlySpending);
+    const mergedFlags = [...new Set([...parsed.flags, ...policyResult.flags])];
     const mergedNotes = [
       ...new Set([...parsed.policy_notes, ...policyResult.notes]),
     ];
@@ -32,11 +43,20 @@ export async function POST(request: Request) {
       policy_notes: mergedNotes,
     };
 
-    // If request_id is provided, save the parsed data to the request
+    // If request_id is provided, save the parsed data and log the event
     if (request_id) {
       const existing = getRequestById(request_id);
       if (existing) {
-        updateRequest(request_id, { parsed: finalParsed });
+        const log = [...(existing.activity_log ?? [])];
+        log.push({
+          timestamp: new Date().toISOString(),
+          action: "parsed",
+          actor: "AI (GPT-5.2)",
+          detail: `Parsed as ${
+            finalParsed.category
+          }, $${finalParsed.amount.toLocaleString()}`,
+        });
+        updateRequest(request_id, { parsed: finalParsed, activity_log: log });
       }
     }
 

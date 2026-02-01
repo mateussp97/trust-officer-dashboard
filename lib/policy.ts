@@ -52,7 +52,8 @@ export interface PolicyCheckResult {
 
 export function checkPolicy(
   parsed: ParsedRequest,
-  beneficiary: string
+  beneficiary: string,
+  currentMonthGSSpending: number = 0
 ): PolicyCheckResult {
   const flags: PolicyFlag[] = [];
   const notes: string[] = [];
@@ -76,12 +77,18 @@ export function checkPolicy(
     );
   }
 
-  // Check general support monthly cap
+  // Check general support monthly cap (cumulative)
   if (parsed.category === "General Support") {
-    if (parsed.amount > TRUST_POLICY.generalSupport.monthlyCapPerBeneficiary) {
+    const cap = TRUST_POLICY.generalSupport.monthlyCapPerBeneficiary;
+    const totalWithRequest = currentMonthGSSpending + parsed.amount;
+    if (totalWithRequest > cap) {
+      const remaining = Math.max(0, cap - currentMonthGSSpending);
       flags.push("exceeds_monthly_cap");
       notes.push(
-        `General Support is capped at $${TRUST_POLICY.generalSupport.monthlyCapPerBeneficiary.toLocaleString()}/month per beneficiary. Requested: $${parsed.amount.toLocaleString()}.`
+        `General Support is capped at $${cap.toLocaleString()}/month per beneficiary. ` +
+        `Already spent this month: $${currentMonthGSSpending.toLocaleString()}. ` +
+        `Remaining: $${remaining.toLocaleString()}. ` +
+        `Requested: $${parsed.amount.toLocaleString()}.`
       );
     }
   }

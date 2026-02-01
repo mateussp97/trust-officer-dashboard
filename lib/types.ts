@@ -35,6 +35,7 @@ export type RequestStatus = "pending" | "approved" | "denied";
 export interface OfficerOverride {
   amount?: number;
   category?: string;
+  urgency?: string;
   notes?: string;
 }
 
@@ -47,6 +48,13 @@ export interface RequestResolution {
   ledger_entry_id?: string;
 }
 
+export interface ActivityEvent {
+  timestamp: string;
+  action: "submitted" | "parsed" | "override_updated" | "approved" | "denied";
+  actor: string;
+  detail?: string;
+}
+
 export interface TrustRequest {
   id: string;
   beneficiary: string;
@@ -56,6 +64,7 @@ export interface TrustRequest {
   parsed?: ParsedRequest;
   officer_override?: OfficerOverride;
   resolution?: RequestResolution;
+  activity_log?: ActivityEvent[];
 }
 
 export interface LedgerSummary {
