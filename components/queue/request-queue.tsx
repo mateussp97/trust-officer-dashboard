@@ -210,18 +210,24 @@ export function RequestQueue() {
     { key: "?", handler: () => setShowShortcutHelp(true) },
   ]);
 
-  const counts = {
-    all: requests.length,
-    pending: requests.filter((r) => r.status === "pending").length,
-    approved: requests.filter((r) => r.status === "approved").length,
-    denied: requests.filter((r) => r.status === "denied").length,
-  };
+  const counts = useMemo(() => {
+    const c = { all: requests.length, pending: 0, approved: 0, denied: 0 };
+    for (const r of requests) {
+      if (r.status === "pending") c.pending++;
+      else if (r.status === "approved") c.approved++;
+      else if (r.status === "denied") c.denied++;
+    }
+    return c;
+  }, [requests]);
 
-  function handleOpenDetail(request: TrustRequest) {
-    openDrawer({
-      content: <RequestDetailContent requestId={request.id} />,
-    });
-  }
+  const handleOpenDetail = useCallback(
+    (request: TrustRequest) => {
+      openDrawer({
+        content: <RequestDetailContent requestId={request.id} />,
+      });
+    },
+    [openDrawer]
+  );
 
   if (isLoadingRequests) {
     return (

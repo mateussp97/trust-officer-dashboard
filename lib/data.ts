@@ -12,25 +12,33 @@ let requestsCache: TrustRequest[] | null = null;
 
 function readLedger(): LedgerEntry[] {
   if (ledgerCache) return ledgerCache;
-  const raw = fs.readFileSync(LEDGER_PATH, "utf-8");
-  ledgerCache = JSON.parse(raw) as LedgerEntry[];
+  try {
+    const raw = fs.readFileSync(LEDGER_PATH, "utf-8");
+    ledgerCache = JSON.parse(raw) as LedgerEntry[];
+  } catch {
+    ledgerCache = [];
+  }
   return ledgerCache;
 }
 
 function readRequests(): TrustRequest[] {
   if (requestsCache) return requestsCache;
-  const raw = fs.readFileSync(REQUESTS_PATH, "utf-8");
-  const seedRequests = JSON.parse(raw) as Array<{
-    id: string;
-    beneficiary: string;
-    submitted_at: string;
-    raw_text: string;
-  }>;
-  // Seed requests don't have status — default to pending
-  requestsCache = seedRequests.map((r) => ({
-    ...r,
-    status: (r as TrustRequest).status || "pending" as const,
-  })) as TrustRequest[];
+  try {
+    const raw = fs.readFileSync(REQUESTS_PATH, "utf-8");
+    const seedRequests = JSON.parse(raw) as Array<{
+      id: string;
+      beneficiary: string;
+      submitted_at: string;
+      raw_text: string;
+    }>;
+    // Seed requests don't have status — default to pending
+    requestsCache = seedRequests.map((r) => ({
+      ...r,
+      status: (r as TrustRequest).status || ("pending" as const),
+    })) as TrustRequest[];
+  } catch {
+    requestsCache = [];
+  }
   return requestsCache;
 }
 

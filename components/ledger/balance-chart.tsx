@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
@@ -21,26 +22,28 @@ export function BalanceChart() {
   const ledger = useDashboardStore((s) => s.ledger);
 
   // Build running balance data points (chronological)
-  const sorted = [...ledger].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  const data = useMemo(() => {
+    const sorted = [...ledger].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
 
-  const data = sorted.reduce<
-    Array<{ date: string; balance: number; description: string }>
-  >((acc, entry) => {
-    const prev = acc.length > 0 ? acc[acc.length - 1].balance : 0;
-    const balance =
-      prev + (entry.type === "CREDIT" ? entry.amount : -entry.amount);
-    acc.push({
-      date: new Date(entry.date).toLocaleDateString("en-US", {
-        month: "short",
-        year: "2-digit",
-      }),
-      balance,
-      description: entry.description,
-    });
-    return acc;
-  }, []);
+    return sorted.reduce<
+      Array<{ date: string; balance: number; description: string }>
+    >((acc, entry) => {
+      const prev = acc.length > 0 ? acc[acc.length - 1].balance : 0;
+      const balance =
+        prev + (entry.type === "CREDIT" ? entry.amount : -entry.amount);
+      acc.push({
+        date: new Date(entry.date).toLocaleDateString("en-US", {
+          month: "short",
+          year: "2-digit",
+        }),
+        balance,
+        description: entry.description,
+      });
+      return acc;
+    }, []);
+  }, [ledger]);
 
   if (data.length === 0) return null;
 

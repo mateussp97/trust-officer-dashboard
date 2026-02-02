@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { SiteHeader } from "@/components/site-header";
 import { RequestQueue } from "@/components/queue/request-queue";
 import { ErrorBoundary } from "@/components/error-boundary";
