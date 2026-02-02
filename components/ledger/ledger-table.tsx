@@ -99,9 +99,7 @@ export function LedgerTable() {
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((e) =>
-        e.description.toLowerCase().includes(q)
-      );
+      result = result.filter((e) => e.description.toLowerCase().includes(q));
     }
 
     return result;
@@ -113,8 +111,7 @@ export function LedgerTable() {
       let cmp = 0;
       switch (sortField) {
         case "date":
-          cmp =
-            new Date(a.date).getTime() - new Date(b.date).getTime();
+          cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
           break;
         case "amount":
           cmp = a.amount - b.amount;
@@ -150,7 +147,7 @@ export function LedgerTable() {
     const rows = sorted.map((entry) => {
       const sign = entry.type === "CREDIT" ? "" : "-";
       return [
-        formatDate(entry.date),
+        entry.date,
         entry.type,
         entry.description,
         `${sign}${entry.amount.toFixed(2)}`,
@@ -166,7 +163,7 @@ export function LedgerTable() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `trust-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `trust-ledger-${new Date().getTime()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -193,9 +190,7 @@ export function LedgerTable() {
       <div className="flex items-center gap-2 flex-wrap">
         <Tabs
           value={typeFilter}
-          onValueChange={(v) =>
-            setTypeFilter(v as "all" | "CREDIT" | "DEBIT")
-          }
+          onValueChange={(v) => setTypeFilter(v as "all" | "CREDIT" | "DEBIT")}
         >
           <TabsList className="h-8">
             <TabsTrigger value="all" className="text-xs px-2.5">
@@ -220,7 +215,10 @@ export function LedgerTable() {
           />
         </div>
 
-        <Select value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
+        <Select
+          value={timeRange}
+          onValueChange={(v) => setTimeRange(v as TimeRange)}
+        >
           <SelectTrigger className="h-8 w-auto min-w-[130px] text-sm">
             <CalendarIcon className="size-3 mr-1.5 text-muted-foreground" />
             <SelectValue />
@@ -292,7 +290,9 @@ export function LedgerTable() {
                   onClick={() => toggleSort("date")}
                 >
                   Date
-                  {sortField === "date" && <SortArrow className="size-3 ml-1 inline" />}
+                  {sortField === "date" && (
+                    <SortArrow className="size-3 ml-1 inline" />
+                  )}
                 </TableHead>
                 <TableHead
                   className={cn(
@@ -302,7 +302,9 @@ export function LedgerTable() {
                   onClick={() => toggleSort("type")}
                 >
                   Type
-                  {sortField === "type" && <SortArrow className="size-3 ml-1 inline" />}
+                  {sortField === "type" && (
+                    <SortArrow className="size-3 ml-1 inline" />
+                  )}
                 </TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead
@@ -313,7 +315,9 @@ export function LedgerTable() {
                   onClick={() => toggleSort("amount")}
                 >
                   Amount
-                  {sortField === "amount" && <SortArrow className="size-3 ml-1 inline" />}
+                  {sortField === "amount" && (
+                    <SortArrow className="size-3 ml-1 inline" />
+                  )}
                 </TableHead>
                 <TableHead className="text-right">Balance</TableHead>
               </TableRow>
