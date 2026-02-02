@@ -25,7 +25,7 @@ A dashboard for trust officers to monitor financial health and process beneficia
 
 ## Tech Stack
 
-Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui, Zustand 5, Recharts, OpenAI SDK (GPT-4o-mini), Sonner, Lucide, vaul
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui, Zustand 5, Recharts, OpenAI SDK (GPT-5.2), Sonner, Lucide, vaul
 
 ## Getting Started
 
@@ -71,7 +71,7 @@ The dialog and drawer stores are mounted once in the layout. Any component can o
 
 Two independent validation layers:
 
-1. **AI parsing** (`lib/openai.ts`) — GPT-4o-mini with JSON mode extracts amount, category, urgency, summary, and flags from raw request text. Policy rules are encoded in the system prompt.
+1. **AI parsing** (`lib/openai.ts`) — GPT-5.2 with JSON mode extracts amount, category, urgency, summary, and flags from raw request text. Policy rules are encoded in the system prompt.
 2. **Policy engine** (`lib/policy.ts`) — pure TypeScript function that checks the parsed result against trust rules independently. Catches prohibited categories, monthly caps ($5k for General Support), large purchase thresholds ($20k+), and unknown beneficiaries.
 
 Even if the AI misclassifies a request, the policy engine will flag it. Prohibited requests have the Approve button disabled at the UI level.
@@ -82,7 +82,7 @@ Even if the AI misclassifies a request, the policy engine will flag it. Prohibit
 |--------|---------|
 | `lib/data.ts` | Server-side data access with in-memory cache + JSON file backing |
 | `lib/policy.ts` | Trust policy rules — `checkPolicy()` returns typed flags |
-| `lib/openai.ts` | AI parsing with GPT-4o-mini, temperature 0.1, JSON response format |
+| `lib/openai.ts` | AI parsing with GPT-5.2, temperature 0.1, JSON response format |
 | `lib/types.ts` | All TypeScript interfaces for the domain |
 | `lib/constants.ts` | Categories, urgency levels, badge color mappings, flag config |
 | `stores/dashboard-store.ts` | Main Zustand store with optimistic updates and derived selectors |

@@ -4,15 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { CheckIcon, XIcon, Loader2Icon } from "lucide-react";
+import { ConfirmApprovalContent } from "@/components/dialogs/confirm-approval-content";
+import { ConfirmDenialContent } from "@/components/dialogs/confirm-denial-content";
+import { CheckIcon, XIcon } from "lucide-react";
 import { useDashboardStore } from "@/stores/dashboard-store";
 import { toast } from "sonner";
 
@@ -106,38 +102,19 @@ export function BatchActionBar({
         onOpenChange={(open) => !open && setConfirmAction(null)}
       >
         <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {confirmAction === "approve"
-                ? `Approve ${count} Requests`
-                : `Deny ${count} Requests`}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {confirmAction === "approve"
-                ? `This will create ${count} DEBIT ledger entries. Each request will be approved at its parsed or overridden amount.`
-                : `This will deny ${count} requests. No ledger entries will be created.`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isProcessing}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirm}
-              disabled={isProcessing}
-              className={
-                confirmAction === "deny"
-                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  : undefined
-              }
-            >
-              {isProcessing ? (
-                <Loader2Icon className="size-4 animate-spin" aria-label="Loading" />
-              ) : confirmAction === "approve" ? (
-                "Confirm Approval"
-              ) : (
-                "Confirm Denial"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+          {confirmAction === "approve" ? (
+            <ConfirmApprovalContent
+              description={`This will create ${count} DEBIT ledger entries. Each request will be approved at its parsed or overridden amount.`}
+              onConfirm={handleConfirm}
+              isProcessing={isProcessing}
+            />
+          ) : (
+            <ConfirmDenialContent
+              description={`This will deny ${count} requests. No ledger entries will be created.`}
+              onConfirm={handleConfirm}
+              isProcessing={isProcessing}
+            />
+          )}
         </AlertDialogContent>
       </AlertDialog>
     </>

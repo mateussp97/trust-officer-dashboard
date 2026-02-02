@@ -15,7 +15,8 @@ function readLedger(): LedgerEntry[] {
   try {
     const raw = fs.readFileSync(LEDGER_PATH, "utf-8");
     ledgerCache = JSON.parse(raw) as LedgerEntry[];
-  } catch {
+  } catch (error) {
+    console.error("Failed to read ledger.json:", error);
     ledgerCache = [];
   }
   return ledgerCache;
@@ -36,7 +37,8 @@ function readRequests(): TrustRequest[] {
       ...r,
       status: (r as TrustRequest).status || ("pending" as const),
     })) as TrustRequest[];
-  } catch {
+  } catch (error) {
+    console.error("Failed to read requests.json:", error);
     requestsCache = [];
   }
   return requestsCache;

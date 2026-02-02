@@ -97,7 +97,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
 
     // Create ledger DEBIT entry
-    const ledgerEntryId = `txn_${Date.now()}`;
+    const ledgerEntryId = `txn_${crypto.randomUUID()}`;
     const ledgerEntry: LedgerEntry = {
       id: ledgerEntryId,
       date: new Date().toISOString(),
