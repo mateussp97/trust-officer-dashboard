@@ -70,6 +70,7 @@ The dashboard layout (`app/(dashboard)/layout.tsx`) is a client component that:
 ### Component Organization
 
 - `components/ui/` — shadcn primitives (do not edit manually; use the add command above)
+- `components/dialogs/` — Reusable confirmation dialog content (approval, denial) used by both single and batch actions
 - `components/ledger/` — Ledger page components (summary cards, table, analytics charts)
 - `components/queue/` — Queue page components (request row, request detail content, batch actions, policy display, beneficiary profile, activity timeline)
 - `components/app-sidebar.tsx` — Navigation sidebar with pending request count badge

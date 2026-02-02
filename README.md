@@ -97,7 +97,7 @@ Even if the AI misclassifies a request, the policy engine will flag it. Prohibit
 
 **Auto-parse on load with `Promise.allSettled`.** All pending unparsed requests are parsed when the Queue page loads, so everything is ready for review. Using `allSettled` instead of `all` means one failed parse doesn't block the rest.
 
-**Client state for filters instead of URL params.** Filters and sorting live in Zustand, not in the URL. This keeps the implementation simpler but means you can't share a filtered view via link. For a multi-officer team, URL search params would be better.
+**Client state for filters instead of URL params.** Filters and sorting live in local component state, not in the URL. This keeps the implementation simpler but means you can't share a filtered view via link. For a multi-officer team, URL search params would be better.
 
 **Types-first development.** All domain types are defined upfront in `lib/types.ts`. The stores, API routes, and components all reference the same interfaces. This made it easier to work with AI assistance — the types serve as a contract that keeps everything consistent.
 
@@ -112,6 +112,7 @@ app/
   api/                  # API routes for ledger, requests, parsing
 components/
   ui/                   # shadcn primitives
+  dialogs/              # Reusable confirmation dialog content
   ledger/               # Ledger page components
   queue/                # Queue page components
 stores/                 # Zustand stores
