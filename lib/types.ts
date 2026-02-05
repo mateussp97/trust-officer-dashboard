@@ -25,7 +25,6 @@ export interface ParsedRequest {
 
 export type PolicyFlag =
   | "prohibited"
-  | "over_limit"
   | "requires_review"
   | "unknown_beneficiary"
   | "exceeds_monthly_cap";

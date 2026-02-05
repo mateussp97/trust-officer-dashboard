@@ -187,7 +187,7 @@ export function RequestQueue() {
         else setFocusedIndex(-1);
       },
     },
-    { key: "?", handler: () => setShowShortcutHelp(true) },
+    { key: "?", shift: true, handler: () => setShowShortcutHelp(true) },
   ]);
 
   const counts = useMemo(() => {
@@ -257,47 +257,46 @@ export function RequestQueue() {
           onClearFilters={clearFilters}
         />
 
-        {(["all", "pending", "approved", "denied"] as const).map((tab) => (
-          <TabsContent key={tab} value={tab}>
-            {sorted.length === 0 ? (
-              <div className="rounded-lg border p-8 text-center">
-                {hasActiveFilters ? (
-                  <SearchIcon className="mx-auto size-8 text-muted-foreground mb-2" />
-                ) : filter === "pending" && counts.pending === 0 ? (
-                  <CheckCircle2Icon className="mx-auto size-8 text-emerald-500 mb-2" />
-                ) : (
-                  <InboxIcon className="mx-auto size-8 text-muted-foreground mb-2" />
-                )}
-                <p className="text-sm text-muted-foreground">{emptyMessage}</p>
-                {hasActiveFilters && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="mt-2 text-xs"
-                  >
-                    Clear all filters
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2" aria-live="polite">
-                {sorted.map((request, index) => (
-                  <RequestRow
-                    key={request.id}
-                    request={request}
-                    isParsing={!!isParsingRequest[request.id]}
-                    onOpenDetail={handleOpenDetail}
-                    selectable={isPendingTab}
-                    selected={selectedIds.has(request.id)}
-                    onToggleSelect={toggleSelect}
-                    focused={index === focusedIndex}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        ))}
+        {/* Single content block — sorted list is already filtered by the active tab */}
+        <TabsContent value={filter}>
+          {sorted.length === 0 ? (
+            <div className="rounded-lg border p-8 text-center">
+              {hasActiveFilters ? (
+                <SearchIcon className="mx-auto size-8 text-muted-foreground mb-2" />
+              ) : filter === "pending" && counts.pending === 0 ? (
+                <CheckCircle2Icon className="mx-auto size-8 text-emerald-500 mb-2" />
+              ) : (
+                <InboxIcon className="mx-auto size-8 text-muted-foreground mb-2" />
+              )}
+              <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="mt-2 text-xs"
+                >
+                  Clear all filters
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2" aria-live="polite">
+              {sorted.map((request, index) => (
+                <RequestRow
+                  key={request.id}
+                  request={request}
+                  isParsing={!!isParsingRequest[request.id]}
+                  onOpenDetail={handleOpenDetail}
+                  selectable={isPendingTab}
+                  selected={selectedIds.has(request.id)}
+                  onToggleSelect={toggleSelect}
+                  focused={index === focusedIndex}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
 
       {isPendingTab && (

@@ -45,7 +45,7 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The app redirects to the Queue page, where pending requests are auto-parsed on load.
+Open [http://localhost:3000](http://localhost:3000). The app redirects to the Ledger page. Navigate to the Queue to see pending requests auto-parsed on load.
 
 ## Architecture
 

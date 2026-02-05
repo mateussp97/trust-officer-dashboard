@@ -55,7 +55,6 @@ export const FLAG_CONFIG: Record<
   { label: string; severity: "blocked" | "warning" }
 > = {
   prohibited: { label: "Prohibited", severity: "blocked" },
-  over_limit: { label: "Over Limit", severity: "warning" },
   requires_review: { label: "Requires Review", severity: "warning" },
   unknown_beneficiary: { label: "Unknown Beneficiary", severity: "warning" },
   exceeds_monthly_cap: { label: "Exceeds Monthly Cap", severity: "warning" },

@@ -49,17 +49,28 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   if (action === "approve") {
-    if (existing.status !== "pending") {
+    // Re-fetch after potential override update to get latest state
+    const current = getRequestById(id)!;
+
+    if (current.status !== "pending") {
       return NextResponse.json(
         { error: "Request already processed" },
         { status: 400 }
       );
     }
 
+    // Server-side prohibition enforcement — never approve prohibited requests
+    if (current.parsed?.flags?.includes("prohibited")) {
+      return NextResponse.json(
+        { error: "Cannot approve a prohibited request. Trust policy blocks this distribution." },
+        { status: 400 }
+      );
+    }
+
     const amount =
       approved_amount ??
-      existing.officer_override?.amount ??
-      existing.parsed?.amount ??
+      current.officer_override?.amount ??
+      current.parsed?.amount ??
       0;
 
     if (amount <= 0) {
@@ -81,15 +92,15 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     // Enforce cumulative monthly cap for General Support
     const effectiveCategory =
-      existing.officer_override?.category ?? existing.parsed?.category;
+      current.officer_override?.category ?? current.parsed?.category;
     if (effectiveCategory === "General Support") {
       const cap = TRUST_POLICY.generalSupport.monthlyCapPerBeneficiary;
-      const monthlySpending = getMonthlyGeneralSupportSpending(existing.beneficiary);
+      const monthlySpending = getMonthlyGeneralSupportSpending(current.beneficiary);
       if (monthlySpending + amount > cap) {
         const remaining = Math.max(0, cap - monthlySpending);
         return NextResponse.json(
           {
-            error: `Approving would exceed the $${cap.toLocaleString()}/month General Support cap for ${existing.beneficiary}. Already spent: $${monthlySpending.toLocaleString()}, Remaining: $${remaining.toLocaleString()}, This request: $${amount.toLocaleString()}.`,
+            error: `Approving would exceed the $${cap.toLocaleString()}/month General Support cap for ${current.beneficiary}. Already spent: $${monthlySpending.toLocaleString()}, Remaining: $${remaining.toLocaleString()}, This request: $${amount.toLocaleString()}.`,
           },
           { status: 400 }
         );
@@ -101,7 +112,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const ledgerEntry: LedgerEntry = {
       id: ledgerEntryId,
       date: new Date().toISOString(),
-      description: `Beneficiary Distribution — ${existing.beneficiary} (${effectiveCategory ?? "General"})`,
+      description: `Beneficiary Distribution — ${current.beneficiary} (${effectiveCategory ?? "General"})`,
       amount,
       type: "DEBIT",
       related_request_id: id,
@@ -120,8 +131,8 @@ export async function PATCH(request: Request, context: RouteContext) {
       ledger_entry_id: ledgerEntryId,
     };
 
-    // Append approved event to activity log
-    const approveLog: ActivityEvent[] = [...(existing.activity_log ?? [])];
+    // Append approved event to activity log (uses current to preserve override log entries)
+    const approveLog: ActivityEvent[] = [...(current.activity_log ?? [])];
     approveLog.push({
       timestamp: new Date().toISOString(),
       action: "approved",

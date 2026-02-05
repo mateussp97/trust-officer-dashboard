@@ -28,7 +28,7 @@ Return a JSON object with exactly these fields:
 - urgency: string (exactly one of: "low", "medium", "high", "critical")
 - summary: string (one-sentence plain-English summary of what's being requested)
 - policy_notes: string[] (array of relevant policy observations, e.g. "Exceeds $20,000 review threshold", "Prohibited: speculative investment")
-- flags: string[] (array of applicable flag codes: "prohibited", "over_limit", "requires_review", "unknown_beneficiary", "exceeds_monthly_cap")
+- flags: string[] (array of applicable flag codes: "prohibited", "requires_review", "unknown_beneficiary", "exceeds_monthly_cap")
 
 Urgency guidelines:
 - critical: Medical emergencies, time-sensitive deadlines (e.g. "due tomorrow")
@@ -62,12 +62,21 @@ export async function parseRequestWithAI(
 
   const parsed = JSON.parse(content) as ParsedRequest;
 
-  // Ensure correct types
+  const VALID_CATEGORIES = ["Education", "Medical", "General Support", "Investment", "Vehicle", "Other"] as const;
+  const VALID_URGENCIES = ["low", "medium", "high", "critical"] as const;
+
+  const category = VALID_CATEGORIES.includes(parsed.category as typeof VALID_CATEGORIES[number])
+    ? parsed.category
+    : "Other";
+  const urgency = VALID_URGENCIES.includes(parsed.urgency as typeof VALID_URGENCIES[number])
+    ? parsed.urgency
+    : "medium";
+
   return {
-    amount: Number(parsed.amount),
-    category: parsed.category,
-    urgency: parsed.urgency,
-    summary: parsed.summary,
+    amount: Number(parsed.amount) || 0,
+    category,
+    urgency,
+    summary: typeof parsed.summary === "string" ? parsed.summary : "",
     policy_notes: Array.isArray(parsed.policy_notes) ? parsed.policy_notes : [],
     flags: Array.isArray(parsed.flags) ? parsed.flags : [],
   };

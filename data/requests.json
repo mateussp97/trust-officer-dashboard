@@ -3,54 +3,251 @@
     "id": "req_001",
     "beneficiary": "Sam Miller",
     "submitted_at": "2026-01-20T10:23:00Z",
-    "raw_text": "Hi team, attaching the invoice for my final semester at Columbia. It's $28,500 due by the 15th of next month. Thanks!"
+    "raw_text": "Hi team, attaching the invoice for my final semester at Columbia. It's $28,500 due by the 15th of next month. Thanks!",
+    "status": "pending",
+    "parsed": {
+      "amount": 28500,
+      "category": "Education",
+      "urgency": "high",
+      "summary": "Sam Miller requests payment of a $28,500 invoice for his final semester at Columbia due by the 15th of next month.",
+      "policy_notes": [
+        "Education expenses are fully covered (tuition and related academic costs).",
+        "Exceeds $20,000 review threshold.",
+        "Amount exceeds $20,000 — requires high-priority review."
+      ],
+      "flags": [
+        "requires_review"
+      ]
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:53.043Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as Education, $28,500"
+      }
+    ]
   },
   {
     "id": "req_002",
     "beneficiary": "Katie Miller",
     "submitted_at": "2026-01-21T14:45:00Z",
-    "raw_text": "I'm planning a research trip to Paris for my art history thesis. My advisor says it's essential for my primary source analysis. Flight and Airbnb should be around $3,200 total. Can I get this covered?"
+    "raw_text": "I'm planning a research trip to Paris for my art history thesis. My advisor says it's essential for my primary source analysis. Flight and Airbnb should be around $3,200 total. Can I get this covered?",
+    "status": "pending",
+    "parsed": {
+      "amount": 3200,
+      "category": "Education",
+      "urgency": "low",
+      "summary": "Katie Miller requests $3,200 to cover flight and Airbnb for a Paris research trip required for her art history thesis primary source analysis.",
+      "policy_notes": [
+        "Education expenses are fully covered, including academic travel."
+      ],
+      "flags": []
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:53.059Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as Education, $3,200"
+      }
+    ]
   },
   {
     "id": "req_003",
     "beneficiary": "Sam Miller",
     "submitted_at": "2026-01-22T08:15:00Z",
-    "raw_text": "Urgent!! I need $50,000 immediately. I have a once-in-a-lifetime opportunity to angel invest in a friend's AI startup. The round closes tomorrow. Need the wire today."
+    "raw_text": "Urgent!! I need $50,000 immediately. I have a once-in-a-lifetime opportunity to angel invest in a friend's AI startup. The round closes tomorrow. Need the wire today.",
+    "status": "pending",
+    "parsed": {
+      "amount": 50000,
+      "category": "Investment",
+      "urgency": "critical",
+      "summary": "Sam Miller requests an immediate $50,000 wire to angel invest in a friend's AI startup with the round closing tomorrow.",
+      "policy_notes": [
+        "Prohibited: speculative investment (angel investing)",
+        "Exceeds $20,000 review threshold",
+        "Time-sensitive deadline (round closes tomorrow; wire needed today)",
+        "Prohibited: Speculative investments are not allowed under trust policy.",
+        "Amount exceeds $20,000 — requires high-priority review."
+      ],
+      "flags": [
+        "prohibited",
+        "requires_review"
+      ]
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:53.400Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as Investment, $50,000"
+      }
+    ]
   },
   {
     "id": "req_004",
     "beneficiary": "Katie Miller",
     "submitted_at": "2026-01-23T19:30:00Z",
-    "raw_text": "Hey, just sending a heads up that I had to go to the ER last night for a broken ankle. The hospital bill after insurance is $1,500. Can the trust cover the deductible?"
+    "raw_text": "Hey, just sending a heads up that I had to go to the ER last night for a broken ankle. The hospital bill after insurance is $1,500. Can the trust cover the deductible?",
+    "status": "pending",
+    "parsed": {
+      "amount": 1500,
+      "category": "Medical",
+      "urgency": "high",
+      "summary": "Katie Miller requests $1,500 to cover an ER visit deductible for a broken ankle.",
+      "policy_notes": [
+        "Medical expenses (including insurance deductibles) are fully covered under the trust policy."
+      ],
+      "flags": []
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:52.582Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as Medical, $1,500"
+      }
+    ]
   },
   {
     "id": "req_005",
     "beneficiary": "Sam Miller",
     "submitted_at": "2026-01-24T11:00:00Z",
-    "raw_text": "I want to buy a Tesla Model S. It's $85,000. The trust document says it covers 'maintenance and support', and I need reliable transportation to get to my new job. My current car has 150k miles and keeps breaking down."
+    "raw_text": "I want to buy a Tesla Model S. It's $85,000. The trust document says it covers 'maintenance and support', and I need reliable transportation to get to my new job. My current car has 150k miles and keeps breaking down.",
+    "status": "pending",
+    "parsed": {
+      "amount": 85000,
+      "category": "Vehicle",
+      "urgency": "medium",
+      "summary": "Sam Miller requests $85,000 to purchase a Tesla Model S for reliable transportation to a new job.",
+      "policy_notes": [
+        "Prohibited: luxury vehicles (Tesla)",
+        "Exceeds $20,000 review threshold",
+        "Prohibited: Luxury vehicles are not allowed under trust policy.",
+        "Amount exceeds $20,000 — requires high-priority review."
+      ],
+      "flags": [
+        "prohibited",
+        "requires_review"
+      ]
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:53.424Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as Vehicle, $85,000"
+      }
+    ]
   },
   {
     "id": "req_006",
     "beneficiary": "Katie Miller",
     "submitted_at": "2026-01-25T09:12:00Z",
-    "raw_text": "I'd like to attend a 2-week intensive art conservation workshop in Florence this summer. It's $8,500 for tuition and materials, plus about $3,000 for travel and accommodation. It's not required for my degree but my advisor strongly recommended it for my career. Total ask is $11,500."
+    "raw_text": "I'd like to attend a 2-week intensive art conservation workshop in Florence this summer. It's $8,500 for tuition and materials, plus about $3,000 for travel and accommodation. It's not required for my degree but my advisor strongly recommended it for my career. Total ask is $11,500.",
+    "status": "pending",
+    "parsed": {
+      "amount": 11500,
+      "category": "Education",
+      "urgency": "low",
+      "summary": "Katie Miller requests $11,500 to cover tuition/materials and travel/accommodation for a 2-week intensive art conservation workshop in Florence this summer.",
+      "policy_notes": [
+        "Education expenses are fully covered, including tuition, materials, and academic/professional development travel."
+      ],
+      "flags": []
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:53.559Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as Education, $11,500"
+      }
+    ]
   },
   {
     "id": "req_007",
     "beneficiary": "Sam Miller",
     "submitted_at": "2026-01-26T16:40:00Z",
-    "raw_text": "I need a new laptop for school. My current one is 5 years old and can barely run the software I need for my CS classes. Looking at a MacBook Pro for $2,499. Also could use a monitor ($400) and some other gear for my home desk setup, maybe $600 total for peripherals. So roughly $3,500 altogether."
+    "raw_text": "I need a new laptop for school. My current one is 5 years old and can barely run the software I need for my CS classes. Looking at a MacBook Pro for $2,499. Also could use a monitor ($400) and some other gear for my home desk setup, maybe $600 total for peripherals. So roughly $3,500 altogether.",
+    "status": "pending",
+    "parsed": {
+      "amount": 3500,
+      "category": "Education",
+      "urgency": "medium",
+      "summary": "Sam Miller requests approximately $3,500 for a school laptop (MacBook Pro), monitor, and related desk peripherals needed for CS classes.",
+      "policy_notes": [
+        "Education expenses are fully covered (tuition, materials, academic needs).",
+        "Total request is below the $20,000 high-priority review threshold."
+      ],
+      "flags": []
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:54.822Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as Education, $3,500"
+      }
+    ]
   },
   {
     "id": "req_008",
     "beneficiary": "Unknown",
     "submitted_at": "2026-01-27T08:00:00Z",
-    "raw_text": "Please process the annual subscription renewal for the family cloud storage and password manager. Total is $349.99."
+    "raw_text": "Please process the annual subscription renewal for the family cloud storage and password manager. Total is $349.99.",
+    "status": "pending",
+    "parsed": {
+      "amount": 349.99,
+      "category": "General Support",
+      "urgency": "low",
+      "summary": "Request to pay the annual renewal for family cloud storage and password manager subscriptions totaling $349.99.",
+      "policy_notes": [
+        "General Support includes subscriptions and is capped at $5,000/month per beneficiary",
+        "Beneficiary listed as Unknown",
+        "Beneficiary \"Unknown\" is not a known trust beneficiary."
+      ],
+      "flags": [
+        "unknown_beneficiary"
+      ]
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:55.139Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as General Support, $349.99"
+      }
+    ]
   },
   {
     "id": "req_009",
     "beneficiary": "Sam Miller",
     "submitted_at": "2026-01-28T10:00:00Z",
-    "raw_text": "I need $4,800 for rent this month and also $4,500 next month since I'm moving to a new apartment. Can you process both?"
+    "raw_text": "I need $4,800 for rent this month and also $4,500 next month since I'm moving to a new apartment. Can you process both?",
+    "status": "pending",
+    "parsed": {
+      "amount": 9300,
+      "category": "General Support",
+      "urgency": "medium",
+      "summary": "Sam Miller requests $4,800 for this month's rent and $4,500 for next month's rent related to moving to a new apartment.",
+      "policy_notes": [
+        "General Support is capped at $5,000/month per beneficiary",
+        "Each monthly rent amount ($4,800 and $4,500) is within the $5,000/month cap",
+        "General Support is capped at $5,000/month per beneficiary. Already spent this month: $0. Remaining: $5,000. Requested: $9,300."
+      ],
+      "flags": [
+        "exceeds_monthly_cap"
+      ]
+    },
+    "activity_log": [
+      {
+        "timestamp": "2026-02-05T18:12:55.054Z",
+        "action": "parsed",
+        "actor": "AI (GPT-5.2)",
+        "detail": "Parsed as General Support, $9,300"
+      }
+    ]
   }
 ]

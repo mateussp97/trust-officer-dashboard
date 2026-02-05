@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const monthlySpending = beneficiary
       ? getMonthlyGeneralSupportSpending(beneficiary)
       : 0;
-    const policyResult = checkPolicy(parsed, beneficiary, monthlySpending);
+    const policyResult = checkPolicy(parsed, beneficiary, monthlySpending, raw_text);
     const mergedFlags = [...new Set([...parsed.flags, ...policyResult.flags])];
     const mergedNotes = [
       ...new Set([...parsed.policy_notes, ...policyResult.notes]),

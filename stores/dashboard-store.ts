@@ -40,6 +40,7 @@ interface DashboardState {
   updateOverride: (id: string, override: OfficerOverride) => Promise<void>;
   batchApprove: (ids: string[]) => Promise<{ succeeded: number; failed: number }>;
   batchDeny: (ids: string[]) => Promise<{ succeeded: number; failed: number }>;
+  resetData: () => Promise<void>;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -163,13 +164,16 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
       if (!res.ok) {
         const error = await res.json();
-        // Rollback
         set(prevState);
         throw new Error(error.error || "Failed to approve request");
       }
 
-      // Reconcile with server truth
-      await get().fetchAll();
+      // Reconcile with server response instead of full refetch
+      const data = await res.json();
+      set((s) => ({
+        requests: s.requests.map((r) => (r.id === id ? data.request : r)),
+        ledger: data.ledgerEntry ? [...s.ledger, data.ledgerEntry] : s.ledger,
+      }));
     } catch (error) {
       // Ensure rollback on network errors too
       if (get().requests.find((r) => r.id === id)?.status === "approved") {
@@ -210,7 +214,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         throw new Error(error.error || "Failed to deny request");
       }
 
-      await get().fetchAll();
+      // Reconcile with server response instead of full refetch
+      const data = await res.json();
+      set((s) => ({
+        requests: s.requests.map((r) => (r.id === id ? data.request : r)),
+      }));
     } catch (error) {
       if (get().requests.find((r) => r.id === id)?.status === "denied") {
         set(prevState);
@@ -222,11 +230,18 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
 
   batchApprove: async (ids) => {
-    const results = await Promise.allSettled(
-      ids.map((id) => get().approveRequest(id, "Batch approved", undefined))
-    );
-    const succeeded = results.filter((r) => r.status === "fulfilled").length;
-    return { succeeded, failed: ids.length - succeeded };
+    // Process sequentially to avoid race conditions with monthly cap checks
+    let succeeded = 0;
+    let failed = 0;
+    for (const id of ids) {
+      try {
+        await get().approveRequest(id, "Batch approved", undefined);
+        succeeded++;
+      } catch {
+        failed++;
+      }
+    }
+    return { succeeded, failed };
   },
 
   batchDeny: async (ids) => {
@@ -251,6 +266,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       requests: state.requests.map((r) => (r.id === id ? data : r)),
     }));
   },
+
+  resetData: async () => {
+    const res = await fetch("/api/reset", { method: "POST" });
+    if (!res.ok) throw new Error("Failed to reset data");
+    await get().fetchAll();
+  },
 }));
 
 // Derived selectors - computed from requests array
@@ -259,5 +280,5 @@ export const selectPendingCount = (state: DashboardState) =>
 
 export const selectPendingExposure = (state: DashboardState) =>
   state.requests
-    .filter((r) => r.status === "pending")
+    .filter((r) => r.status === "pending" && !r.parsed?.flags?.includes("prohibited"))
     .reduce((sum, r) => sum + (r.parsed?.amount ?? 0), 0);

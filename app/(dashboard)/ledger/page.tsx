@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { SiteHeader } from "@/components/site-header";
 import { LedgerSummaryCards } from "@/components/ledger/ledger-summary-cards";
 import { LedgerTable } from "@/components/ledger/ledger-table";

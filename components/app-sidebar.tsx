@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   BookOpenIcon,
   InboxIcon,
+  RotateCcwIcon,
   UserIcon,
 } from "lucide-react";
 
@@ -23,7 +24,9 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { useDashboardStore, selectPendingCount } from "@/stores/dashboard-store";
+import { toast } from "sonner";
 
 const NAV_ITEMS = [
   {
@@ -41,6 +44,8 @@ const NAV_ITEMS = [
 export function AppSidebar() {
   const pathname = usePathname();
   const pendingCount = useDashboardStore(selectPendingCount);
+  const resetData = useDashboardStore((s) => s.resetData);
+  const parseAllPending = useDashboardStore((s) => s.parseAllPending);
 
   return (
     <Sidebar variant="inset">
@@ -96,6 +101,25 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <SidebarSeparator />
+        <div className="px-2 py-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground"
+            onClick={async () => {
+              try {
+                await resetData();
+                await parseAllPending();
+                toast.success("Data reset to seed state");
+              } catch {
+                toast.error("Failed to reset data");
+              }
+            }}
+          >
+            <RotateCcwIcon className="size-3.5" />
+            Reset Demo Data
+          </Button>
+        </div>
         <div className="flex items-center gap-2 px-2 py-1">
           <div className="flex size-7 items-center justify-center rounded-full bg-muted">
             <UserIcon className="size-3.5 text-muted-foreground" />

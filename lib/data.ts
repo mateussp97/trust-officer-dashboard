@@ -3,6 +3,7 @@ import path from "path";
 import type { LedgerEntry, TrustRequest, LedgerSummary, RequestsSummary } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
+const SEED_DIR = path.join(process.cwd(), "starter-files", "data");
 const LEDGER_PATH = path.join(DATA_DIR, "ledger.json");
 const REQUESTS_PATH = path.join(DATA_DIR, "requests.json");
 
@@ -89,10 +90,9 @@ export function getRequestsSummary(): RequestsSummary {
   );
 
   const pending = sorted.filter((r) => r.status === "pending");
-  const pendingExposure = pending.reduce(
-    (sum, r) => sum + (r.parsed?.amount ?? 0),
-    0
-  );
+  const pendingExposure = pending
+    .filter((r) => !r.parsed?.flags?.includes("prohibited"))
+    .reduce((sum, r) => sum + (r.parsed?.amount ?? 0), 0);
 
   return {
     requests: sorted,
@@ -135,6 +135,15 @@ export function getBalance(): number {
 export function getKnownBeneficiaries(): string[] {
   const requests = readRequests();
   return [...new Set(requests.map((r) => r.beneficiary))].sort();
+}
+
+export function resetData(): void {
+  const seedLedger = fs.readFileSync(path.join(SEED_DIR, "ledger.json"), "utf-8");
+  const seedRequests = fs.readFileSync(path.join(SEED_DIR, "requests.json"), "utf-8");
+  fs.writeFileSync(LEDGER_PATH, seedLedger, "utf-8");
+  fs.writeFileSync(REQUESTS_PATH, seedRequests, "utf-8");
+  ledgerCache = null;
+  requestsCache = null;
 }
 
 export function getMonthlyGeneralSupportSpending(

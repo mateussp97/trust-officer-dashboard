@@ -53,20 +53,52 @@ export interface PolicyCheckResult {
 export function checkPolicy(
   parsed: ParsedRequest,
   beneficiary: string,
-  currentMonthGSSpending: number = 0
+  currentMonthGSSpending: number = 0,
+  rawText?: string
 ): PolicyCheckResult {
   const flags: PolicyFlag[] = [];
   const notes: string[] = [];
 
-  // Check prohibited categories
-  if (
-    parsed.category === "Investment" ||
-    parsed.category === "Vehicle"
-  ) {
+  // Check prohibited categories — investments are always prohibited
+  if (parsed.category === "Investment") {
     flags.push("prohibited");
     notes.push(
-      `Prohibited: ${parsed.category === "Investment" ? "Speculative investments" : "Luxury vehicles"} are not allowed under trust policy.`
+      "Prohibited: Speculative investments are not allowed under trust policy."
     );
+  }
+
+  // Vehicles are flagged for review; luxury vehicles are prohibited
+  if (parsed.category === "Vehicle") {
+    const textToCheck = `${parsed.summary} ${rawText ?? ""}`.toLowerCase();
+    const luxuryVehicleKeywords = TRUST_POLICY.prohibited.keywords.filter(
+      (k) => ["tesla", "ferrari", "lamborghini", "porsche"].includes(k)
+    );
+    const isLuxury = luxuryVehicleKeywords.some((k) => textToCheck.includes(k));
+    if (isLuxury) {
+      flags.push("prohibited");
+      notes.push(
+        "Prohibited: Luxury vehicles are not allowed under trust policy."
+      );
+    } else {
+      flags.push("requires_review");
+      notes.push(
+        "Vehicle purchase requires officer review to determine if it qualifies as a luxury vehicle."
+      );
+    }
+  }
+
+  // Keyword-based prohibition check (catches miscategorized requests)
+  if (!flags.includes("prohibited")) {
+    const textToCheck = `${parsed.summary} ${rawText ?? ""}`.toLowerCase();
+    const matchedKeyword = TRUST_POLICY.prohibited.keywords.find((k) =>
+      textToCheck.includes(k)
+    );
+    if (matchedKeyword) {
+      flags.push("prohibited");
+      notes.push(
+        `Prohibited: Request text matches prohibited keyword "${matchedKeyword}".`
+      );
+    }
   }
 
   // Check large purchase threshold
