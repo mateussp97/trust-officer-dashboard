@@ -8,26 +8,12 @@ export interface LedgerEntry {
   created_by?: string;
 }
 
-export interface ParsedRequest {
-  amount: number;
-  category:
-    | "Education"
-    | "Medical"
-    | "General Support"
-    | "Investment"
-    | "Vehicle"
-    | "Other";
-  urgency: "low" | "medium" | "high" | "critical";
-  summary: string;
-  policy_notes: string[];
-  flags: PolicyFlag[];
-}
+import type { z } from "zod";
+import type { ParsedRequestSchema, PolicyFlagSchema } from "./schemas";
 
-export type PolicyFlag =
-  | "prohibited"
-  | "requires_review"
-  | "unknown_beneficiary"
-  | "exceeds_monthly_cap";
+export type ParsedRequest = z.output<typeof ParsedRequestSchema>;
+
+export type PolicyFlag = z.output<typeof PolicyFlagSchema>;
 
 export type RequestStatus = "pending" | "approved" | "denied";
 

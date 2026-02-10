@@ -28,7 +28,7 @@ Client (Zustand stores) → API routes → lib/data.ts (in-memory cache + JSON f
 ```
 
 - **Persistence**: JSON files in `data/` with in-memory caching in `lib/data.ts`. No database. Cache resets on server restart. All server-side reads/writes go through `lib/data.ts`.
-- **AI parsing**: `lib/openai.ts` calls GPT-5.2 with JSON mode to extract structured fields (amount, category, urgency, flags) from raw request text. Policy rules are encoded in the system prompt and also enforced server-side via `lib/policy.ts`.
+- **AI parsing**: `lib/openai.ts` uses Vercel AI SDK (`generateText` + `Output.object()`) with GPT-5.2 and Zod schema validation to extract structured fields (amount, category, urgency, flags) from raw request text. Policy rules are encoded in the system prompt and also enforced server-side via `lib/policy.ts`.
 
 ### State Management
 
@@ -62,8 +62,9 @@ The dashboard layout (`app/(dashboard)/layout.tsx`) is a client component that:
 
 - `lib/data.ts` — Server-side data access with in-memory cache + JSON file backing.
 - `lib/policy.ts` — Trust policy rules. `checkPolicy()` returns flags: `prohibited`, `over_limit`, `requires_review`, `unknown_beneficiary`, `exceeds_monthly_cap`.
-- `lib/openai.ts` — `parseRequestWithAI()` using GPT-5.2, temperature 0.1, JSON response format.
-- `lib/types.ts` — All TypeScript interfaces: `LedgerEntry`, `TrustRequest`, `ParsedRequest`, `PolicyFlag`, `ActivityEvent`, `RequestResolution`, `OfficerOverride`.
+- `lib/schemas.ts` — Zod schemas for AI-generated data. `ParsedRequestSchema` defines the structure expected from the LLM. Types in `lib/types.ts` are derived from these schemas via `z.output`.
+- `lib/openai.ts` — `parseRequestWithAI()` using Vercel AI SDK + GPT-5.2, temperature 0.1, Zod-validated structured output.
+- `lib/types.ts` — All TypeScript interfaces: `LedgerEntry`, `TrustRequest`, `ParsedRequest`, `PolicyFlag`, `ActivityEvent`, `RequestResolution`, `OfficerOverride`. `ParsedRequest` and `PolicyFlag` are derived from Zod schemas.
 - `lib/constants.ts` — Domain constants with `as const` typing: categories, urgency levels/ordering, badge color mappings (`CATEGORY_COLORS`, `URGENCY_COLORS`, `STATUS_COLORS`), and `FLAG_CONFIG` (labels + severity).
 - `lib/format.ts` — Currency and date formatting utilities.
 
@@ -87,7 +88,7 @@ The dashboard layout (`app/(dashboard)/layout.tsx`) is a client component that:
 
 ## Tech Stack
 
-Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui (radix-vega style), Zustand 5, Recharts, OpenAI SDK, Sonner (toasts), Lucide icons, vaul (drawer).
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui (radix-vega style), Zustand 5, Recharts, Vercel AI SDK, Zod, Sonner (toasts), Lucide icons, vaul (drawer).
 
 ## Domain Context
 

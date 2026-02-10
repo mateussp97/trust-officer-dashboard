@@ -1,14 +1,5 @@
-"use client";
-
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  BookOpenIcon,
-  InboxIcon,
-  RotateCcwIcon,
-  UserIcon,
-} from "lucide-react";
+import { UserIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -18,35 +9,12 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { useDashboardStore, selectPendingCount } from "@/stores/dashboard-store";
-import { toast } from "sonner";
-
-const NAV_ITEMS = [
-  {
-    label: "Ledger",
-    href: "/ledger",
-    icon: BookOpenIcon,
-  },
-  {
-    label: "Request Queue",
-    href: "/queue",
-    icon: InboxIcon,
-  },
-];
+import { SidebarNav } from "@/components/sidebar-nav";
+import { SidebarResetButton } from "@/components/sidebar-reset-button";
 
 export function AppSidebar() {
-  const pathname = usePathname();
-  const pendingCount = useDashboardStore(selectPendingCount);
-  const resetData = useDashboardStore((s) => s.resetData);
-  const parseAllPending = useDashboardStore((s) => s.parseAllPending);
-
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
@@ -77,49 +45,14 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {NAV_ITEMS.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
-                        <item.icon className="size-4" />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                    {item.href === "/queue" && pendingCount > 0 && (
-                      <SidebarMenuBadge>{pendingCount}</SidebarMenuBadge>
-                    )}
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+            <SidebarNav />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
         <SidebarSeparator />
-        <div className="px-2 py-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start gap-2 text-muted-foreground"
-            onClick={async () => {
-              try {
-                await resetData();
-                await parseAllPending();
-                toast.success("Data reset to seed state");
-              } catch {
-                toast.error("Failed to reset data");
-              }
-            }}
-          >
-            <RotateCcwIcon className="size-3.5" />
-            Reset Demo Data
-          </Button>
-        </div>
+        <SidebarResetButton />
         <div className="flex items-center gap-2 px-2 py-1">
           <div className="flex size-7 items-center justify-center rounded-full bg-muted">
             <UserIcon className="size-3.5 text-muted-foreground" />
