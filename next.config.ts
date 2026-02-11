@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       {
         source: "/",
         destination: "/ledger",
-        permanent: true,
+        permanent: false,
       },
     ];
   },
